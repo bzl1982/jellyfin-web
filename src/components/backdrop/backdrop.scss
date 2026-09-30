@@ -6,6 +6,28 @@
     right: 0;
     height: 100vh;
     z-index: -1;
+    overflow: hidden;
+
+    // FUSE3：模糊 fanart 之上的暗色遮罩（左重右轻，保证左侧 Spotlight/InfoPanel 可读）
+    &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        pointer-events: none;
+        background:
+            linear-gradient(
+                90deg,
+                rgba(0, 0, 0, calc(var(--fuse3-overlay) + 0.25)) 0%,
+                rgba(0, 0, 0, var(--fuse3-overlay)) 38%,
+                rgba(0, 0, 0, calc(var(--fuse3-overlay) - 0.3)) 100%
+            ),
+            linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.8) 0%,
+                rgba(0, 0, 0, 0.1) 55%
+            );
+    }
 }
 
 .backdropImage {
@@ -18,10 +40,20 @@
     right: 0;
     bottom: 0;
     contain: layout style;
+    // FUSE3：重模糊 fanart + 轻微放大遮住模糊边缘
+    filter: blur(var(--fuse3-blur)) saturate(1.1);
+    // FUSE3：translate3d(0,0,0) + will-change 强制 GPU 合成层，
+    // 防止电视低配芯片主动放弃高斯模糊渲染（谷歌咨询建议，2026-08-14）
+    will-change: filter, transform;
+    transform: scale(var(--fuse3-zoom-from)) translate3d(0, 0, 0);
+    // FUSE3：缓慢 Ken Burns 放大（100→150）
+    animation: fuse3-backdrop-zoom var(--fuse3-zoom-dur) ease-out forwards;
 }
 
 .backdropImageFadeIn {
-    animation: backdrop-fadein 800ms ease-in normal both;
+    animation:
+        backdrop-fadein 800ms ease-in normal both,
+        fuse3-backdrop-zoom var(--fuse3-zoom-dur) ease-out forwards;
 }
 
 @keyframes backdrop-fadein {
@@ -31,5 +63,15 @@
 
     to {
         opacity: 1;
+    }
+}
+
+@keyframes fuse3-backdrop-zoom {
+    from {
+        transform: scale(var(--fuse3-zoom-from));
+    }
+
+    to {
+        transform: scale(var(--fuse3-zoom-to));
     }
 }

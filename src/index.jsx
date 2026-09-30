@@ -40,6 +40,8 @@ import './scripts/mouseManager';
 import './scripts/screensavermanager';
 
 // Import site styles
+// FUSE3 设计语言视觉 token（:root 全局变量，单一事实源镜像，先于其它样式加载确保变量最早就绪）
+import './themes/fuse3.scss';
 import './styles/site.scss';
 import './styles/livetv.scss';
 import './styles/dashboard.scss';
